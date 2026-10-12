@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BroadLink — Built for integration.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Manrope:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--accent:#006FFF;--accent-d:#0058CC;--bg:#FFFFFF;--soft:#F4F5F7;--surface:#EAEDF1;--text:#0A0F14;--muted:#5B6672;--r:16px}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:Manrope,"Noto Sans TC",system-ui,sans-serif;color:var(--text);background:var(--bg);line-height:1.5;-webkit-font-smoothing:antialiased}
+img{display:block;width:100%;height:100%;object-fit:cover}
+button{font:inherit;cursor:pointer}
+.mono{font-family:"JetBrains Mono",monospace}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+
+/* annotations */
+.note{display:none;font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--accent-d);background:#E6F0FF;border:1px dashed var(--accent);border-radius:6px;padding:3px 8px;margin:0 0 10px;width:max-content;max-width:100%}
+body.show-notes .note{display:block}
+body.show-notes [data-sec]{outline:1px dashed rgba(0,111,255,.35);outline-offset:6px}
+
+/* header */
+header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--surface)}
+.bar{display:flex;align-items:center;gap:20px;height:64px}
+.logo{font-weight:800;font-size:20px;letter-spacing:-.02em}
+.logo b{color:var(--accent)}
+nav{display:flex;gap:4px;margin-left:auto}
+.tab{border:0;background:none;padding:8px 14px;border-radius:999px;font-weight:600;font-size:14px;color:var(--muted)}
+.tab:hover{background:var(--soft)}
+.tab.on{background:var(--text);color:#fff}
+.tog{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);cursor:pointer;user-select:none}
+.tog input{accent-color:var(--accent)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:999px;padding:14px 26px;font-weight:700;font-size:15px;background:var(--accent);color:#fff;transition:.15s}
+.btn:hover{background:var(--accent-d);transform:translateY(-1px)}
+.btn.ghost{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.5)}
+.btn.ghost:hover{background:rgba(255,255,255,.26)}
+.btn.line{background:none;color:var(--text);border:1px solid var(--surface)}
+.btn.line:hover{background:var(--soft)}
+
+.panel{display:none;padding-bottom:80px}
+.panel.on{display:block}
+section{margin-top:72px}
+h1,h2,h3{letter-spacing:-.02em;line-height:1.1}
+h2{font-size:clamp(26px,3.2vw,38px);font-weight:800}
+.sub{color:var(--muted);margin-top:10px;max-width:560px}
+.eyebrow{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--accent);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
+
+/* hero */
+.hero{position:relative;height:500px;border-radius:24px;overflow:hidden;margin-top:24px;color:#fff;display:flex;align-items:flex-end}
+.hero img{position:absolute;inset:0}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,12,24,.88) 0%,rgba(5,12,24,.45) 55%,rgba(5,12,24,.1) 100%)}
+.hero-in{position:relative;z-index:2;padding:48px;max-width:640px}
+.hero h1{font-size:clamp(34px,5vw,58px);font-weight:800}
+.hero h1 span{color:#6FB0FF}
+.hero p{margin:16px 0 26px;font-size:17px;opacity:.9}
+.hero .row{display:flex;gap:12px;flex-wrap:wrap}
+.strip{display:flex;align-items:center;gap:22px;flex-wrap:wrap;margin-top:22px;padding:16px 24px;background:var(--soft);border-radius:var(--r)}
+.strip small{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.strip img{width:36px;height:36px;object-fit:contain}
+.strip .ic{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600}
+
+/* cards */
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:28px}
+.cap{background:var(--soft);border-radius:var(--r);padding:22px;transition:.2s}
+.cap:hover{background:var(--surface);transform:translateY(-3px)}
+.cap .ico{width:44px;height:44px;border-radius:12px;background:var(--accent);display:grid;place-items:center;margin-bottom:16px}
+.cap .ico svg{width:24px;height:24px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.cap h3{font-size:17px;font-weight:700}
+.cap p{font-size:14px;color:var(--muted);margin-top:4px}
+
+/* architecture */
+.arch{margin-top:28px;background:var(--text);border-radius:24px;padding:32px;color:#fff;overflow-x:auto}
+.arch svg{width:100%;min-width:720px;height:auto;display:block}
+.arch text{font-family:Manrope,sans-serif}
+
+/* scenarios */
+.scn{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:28px}
+.sc{background:#fff;border:1px solid var(--surface);border-radius:var(--r);overflow:hidden;transition:.2s;display:flex;flex-direction:column}
+.sc:hover{box-shadow:0 14px 34px rgba(10,15,20,.1);transform:translateY(-3px)}
+.sc .ph{height:180px;overflow:hidden;position:relative}
+.sc .ph img{transition:transform .5s}
+.sc:hover .ph img{transform:scale(1.05)}
+.sc .ph em{position:absolute;left:12px;top:12px;font-style:normal;font-family:"JetBrains Mono",monospace;font-size:11px;background:rgba(255,255,255,.92);padding:3px 9px;border-radius:999px}
+.sc .bd{padding:18px 20px 20px}
+.sc h3{font-size:18px;font-weight:700}
+.sc p{font-size:14px;color:var(--muted);margin-top:4px}
+.sc details{margin-top:12px;font-size:13px}
+.sc summary{cursor:pointer;color:var(--accent);font-weight:700;list-style:none}
+.sc summary::-webkit-details-marker{display:none}
+.sc details[open] summary{margin-bottom:6px}
+.sc details span{color:var(--muted)}
+.more{display:flex;justify-content:center;margin-top:26px}
+
+/* stepper */
+.stepper{display:grid;grid-template-columns:repeat(5,1fr);gap:0;margin-top:28px;counter-reset:s}
+.step{position:relative;text-align:center;padding:0 8px}
+.step::before{counter-increment:s;content:counter(s);display:grid;place-items:center;width:44px;height:44px;margin:0 auto 10px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;position:relative;z-index:1}
+.step::after{content:"";position:absolute;top:22px;left:50%;width:100%;height:2px;background:var(--surface)}
+.step:last-child::after{display:none}
+.step b{display:block;font-size:15px}
+.step span{font-size:13px;color:var(--muted)}
+
+/* CTA */
+.cta{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;background:var(--accent);color:#fff;border-radius:24px;padding:40px 44px}
+.cta h2{font-size:clamp(24px,3vw,34px)}
+.cta .btn{background:#fff;color:var(--accent-d)}
+.cta .btn:hover{background:var(--soft)}
+
+/* devices */
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px}
+.chip{border:1px solid var(--surface);background:#fff;border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600}
+.chip.on{background:var(--text);color:#fff;border-color:var(--text)}
+button.chip:hover{background:var(--soft)}
+button.chip.on:hover{background:var(--text)}
+.dev{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:24px}
+.card{border:0;background:none;text-align:left;padding:0}
+.tile{aspect-ratio:1;border-radius:var(--r);overflow:hidden;position:relative;transition:.2s}
+.card:hover .tile{transform:translateY(-4px);box-shadow:0 14px 30px rgba(10,15,20,.14)}
+.tile svg{width:100%;height:100%;display:block}
+.tile .pf{position:absolute;right:10px;bottom:10px;width:26px;height:26px;border-radius:7px;background:#fff;padding:3px}
+.tile .pf img{object-fit:contain}
+.card h3{font-size:15px;font-weight:700;margin-top:10px}
+.card p{font-size:13px;color:var(--muted)}
+.note-line{display:flex;align-items:center;gap:10px;margin-top:28px;padding:14px 18px;background:var(--soft);border-radius:var(--r);font-size:14px}
+.note-line b.mono{color:var(--accent-d)}
+
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(10,15,20,.6);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}
+.modal.on{display:flex}
+.mbox{background:#fff;border-radius:24px;max-width:720px;width:100%;display:grid;grid-template-columns:1fr 1fr;overflow:hidden;position:relative}
+.mbox .tile{border-radius:0;aspect-ratio:auto;min-height:320px}
+.mbox .tx{padding:32px 28px}
+.mbox h3{font-size:24px;font-weight:800}
+.mbox ul{margin:14px 0 22px;padding-left:18px;font-size:14px;color:var(--muted)}
+.mbox li{margin:4px 0}
+.x{position:absolute;right:12px;top:12px;width:34px;height:34px;border-radius:50%;border:0;background:rgba(255,255,255,.9);font-size:18px;z-index:2}
+
+/* inquire */
+.inq{display:grid;grid-template-columns:1fr 1.1fr;gap:0;margin-top:24px;border-radius:24px;overflow:hidden;background:var(--soft)}
+.inq .side{position:relative;min-height:480px;color:#fff;display:flex;align-items:flex-end}
+.inq .side img{position:absolute;inset:0}
+.inq .side::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(5,12,24,.85),rgba(5,12,24,.05) 65%)}
+.inq .side div{position:relative;z-index:2;padding:32px}
+.inq .side h2{font-size:30px}
+.inq .side p{opacity:.9;margin-top:8px}
+form{padding:36px;display:grid;gap:14px;align-content:start}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label{display:grid;gap:5px;font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+input[type=text],input[type=email],select,textarea{font:inherit;font-size:15px;color:var(--text);background:#fff;border:1px solid var(--surface);border-radius:12px;padding:12px 14px;text-transform:none;letter-spacing:0;font-weight:500;width:100%}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:-1px}
+textarea{resize:vertical;min-height:70px}
+.chk{display:flex;gap:8px;flex-wrap:wrap}
+.chk label{display:block}
+.chk input{display:none}
+.chk span{display:inline-block;border:1px solid var(--surface);background:#fff;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;color:var(--text);text-transform:none;letter-spacing:0}
+.chk input:checked+span{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* toast */
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,30px);opacity:0;pointer-events:none;background:var(--text);color:#fff;padding:14px 22px;border-radius:999px;font-weight:600;font-size:14px;z-index:60;transition:.3s}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+footer{border-top:1px solid var(--surface);padding:28px 0;color:var(--muted);font-size:13px}
+footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+@media(max-width:900px){
+ .grid4,.dev{grid-template-columns:repeat(2,1fr)}
+ .scn{grid-template-columns:1fr 1fr}
+ .inq,.mbox{grid-template-columns:1fr}
+ .inq .side{min-height:260px}
+ .hero{height:440px}.hero-in{padding:28px}
+ .stepper{grid-template-columns:1fr;gap:18px}.step{display:flex;gap:14px;text-align:left;align-items:center}.step::before{margin:0;flex:none}.step::after{display:none}
+ .bar{flex-wrap:wrap;height:auto;padding:10px 0}nav{order:3;width:100%;overflow-x:auto;margin:0}
+ .tog{margin-left:auto}
+}
+@media(max-width:560px){.scn{grid-template-columns:1fr}.f2{grid-template-columns:1fr}}
+</style>
+</head>
+<body class="show-notes">
+
+<header>
+ <div class="wrap bar">
+  <div class="logo">Broad<b>Link</b></div>
+  <nav id="tabs" role="tablist">
+   <button class="tab on" data-tab="solutions">Solutions</button>
+   <button class="tab" data-tab="scenarios">Scenarios</button>
+   <button class="tab" data-tab="devices">Devices</button>
+   <button class="tab" data-tab="inquire">Inquire</button>
+  </nav>
+  <label class="tog"><input type="checkbox" id="notes" checked> Shopify sections</label>
+ </div>
+</header>
+
+<main class="wrap">
+
+<!-- ============ SOLUTIONS ============ -->
+<div class="panel on" id="solutions">
+ <div data-sec>
+  <div class="note" style="margin-top:20px">[section: hero-banner · image-with-text-overlay]</div>
+  <div class="hero">
+   <img src="assets/business/software.jpg" alt="Smart building control software on a dashboard">
+   <div class="hero-in">
+    <div class="eyebrow" style="color:#9CC8FF">Commercial smart building</div>
+    <h1>Built for integration.<br><span>Devices, software and APIs as one system.</span></h1>
+    <p>Devices, software and APIs — delivered as one system for your projects.</p>
+    <div class="row">
+     <button class="btn" data-go="inquire">Request a project consultation</button>
+     <button class="btn ghost" data-go="scenarios">See scenarios</button>
+    </div>
+   </div>
+  </div>
+ </div>
+
+ <div class="strip" data-sec>
+  <div class="note" style="width:100%">[section: logo-list · platform-icons]</div>
+  <small>Works with</small>
+  <span class="ic"><img src="assets/partners/matter_icon.png" alt="Matter">Matter</span>
+  <span class="ic"><img src="assets/partners/applehome_icon.png" alt="Apple Home">Apple Home</span>
+  <span class="ic"><img src="assets/partners/googlehome_icon.png" alt="Google Home">Google Home</span>
+  <span class="ic"><img src="assets/partners/alexa_icon.png" alt="Alexa">Alexa</span>
+  <span class="ic"><img src="assets/partners/smartthings_icon.png" alt="SmartThings">SmartThings</span>
+ </div>
+
+ <section data-sec>
+  <div class="note">[section: multicolumn · 4 capability cards]</div>
+  <div class="eyebrow">What we do</div>
+  <h2>Four capabilities. One partner.</h2>
+  <div class="grid4">
+   <div class="cap"><div class="ico"><svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4-9 4-9-4zM3 12l9 4 9-4M3 17l9 4 9-4"/></svg></div><h3>Supply &amp; lifecycle</h3><p>Stock, ship and support every device.</p></div>
+   <div class="cap"><div class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div><h3>Software</h3><p>Control and monitor sites from one console.</p></div>
+   <div class="cap"><div class="ico"><svg viewBox="0 0 24 24"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></svg></div><h3>API / SDK middleware</h3><p>Connect devices to your own systems.</p></div>
+   <div class="cap"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5M17 11a3 3 0 100-6M21.5 19c-.3-2.2-1.6-3.7-3.5-4.3"/></svg></div><h3>SI enablement</h3><p>Training and tools for integrators.</p></div>
+  </div>
+ </section>
+
+ <section data-sec>
+  <div class="note">[section: custom-liquid · architecture-diagram (inline SVG)]</div>
+  <div class="eyebrow">How it fits</div>
+  <h2>One stack, device to dashboard.</h2>
+  <div class="arch">
+   <svg viewBox="0 0 960 300" role="img" aria-label="Architecture: devices to hub, to middleware, to apps and your systems">
+    <defs>
+     <marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#6FB0FF"/></marker>
+     <linearGradient id="gb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#006FFF"/><stop offset="1" stop-color="#0058CC"/></linearGradient>
+    </defs>
+    <g fill="none" stroke="#6FB0FF" stroke-width="2" marker-end="url(#ar)">
+     <path d="M212 150H258"/><path d="M458 150H502"/><path d="M702 150H748"/>
+    </g>
+    <g>
+     <rect x="20" y="30" width="190" height="240" rx="18" fill="#141C26" stroke="#2A3644"/>
+     <text x="115" y="58" text-anchor="middle" fill="#8FA2B8" font-size="12" font-family="JetBrains Mono,monospace">DEVICES</text>
+     <g font-size="14" font-weight="700" fill="#fff" text-anchor="middle">
+      <rect x="40" y="76" width="150" height="40" rx="10" fill="#1F2A38"/><text x="115" y="101">Plugs &amp; lights</text>
+      <rect x="40" y="130" width="150" height="40" rx="10" fill="#1F2A38"/><text x="115" y="155">Sensors</text>
+      <rect x="40" y="184" width="150" height="40" rx="10" fill="#1F2A38"/><text x="115" y="209">RM4 PRO</text>
+     </g>
+     <text x="115" y="250" text-anchor="middle" fill="#6FB0FF" font-size="11" font-family="JetBrains Mono,monospace">Matter · FastCon</text>
+    </g>
+    <g>
+     <rect x="260" y="95" width="196" height="110" rx="18" fill="url(#gb)"/>
+     <text x="358" y="140" text-anchor="middle" fill="#fff" font-size="12" font-family="JetBrains Mono,monospace" opacity=".8">GATEWAY</text>
+     <text x="358" y="170" text-anchor="middle" fill="#fff" font-size="20" font-weight="800">Hubs</text>
+    </g>
+    <g>
+     <rect x="504" y="95" width="196" height="110" rx="18" fill="#fff"/>
+     <text x="602" y="140" text-anchor="middle" fill="#0058CC" font-size="12" font-family="JetBrains Mono,monospace">MIDDLEWARE</text>
+     <text x="602" y="170" text-anchor="middle" fill="#0A0F14" font-size="20" font-weight="800">API / SDK</text>
+    </g>
+    <g>
+     <rect x="750" y="30" width="190" height="240" rx="18" fill="#141C26" stroke="#2A3644"/>
+     <text x="845" y="58" text-anchor="middle" fill="#8FA2B8" font-size="12" font-family="JetBrains Mono,monospace">OUTCOMES</text>
+     <g font-size="14" font-weight="700" fill="#fff" text-anchor="middle">
+      <rect x="770" y="76" width="150" height="40" rx="10" fill="#1F2A38"/><text x="845" y="101">Console</text>
+      <rect x="770" y="130" width="150" height="40" rx="10" fill="#1F2A38"/><text x="845" y="155">Your systems</text>
+      <rect x="770" y="184" width="150" height="40" rx="10" fill="#1F2A38"/><text x="845" y="209">Home apps</text>
+     </g>
+    </g>
+   </svg>
+  </div>
+ </section>
+
+ <section data-sec>
+  <div class="note">[section: featured-collection · scenario teasers (3)]</div>
+  <div class="eyebrow">Where it works</div>
+  <h2>Built for real buildings.</h2>
+  <div class="scn" id="teasers"></div>
+  <div class="more"><button class="btn line" data-go="scenarios">All 6 scenarios →</button></div>
+ </section>
+
+ <section data-sec>
+  <div class="note">[section: call-to-action-banner]</div>
+  <div class="cta">
+   <div><h2>Planning a project?</h2><p style="opacity:.9;margin-top:6px">Tell us the site. We reply within 2 business days.</p></div>
+   <button class="btn" data-go="inquire">Request a project consultation</button>
+  </div>
+ </section>
+</div>
+
+<!-- ============ SCENARIOS ============ -->
+<div class="panel" id="scenarios">
+ <section data-sec style="margin-top:40px">
+  <div class="note">[section: collection-list · 6 scenario cards]</div>
+  <div class="eyebrow">Scenarios</div>
+  <h2>Six places we deliver.</h2>
+  <p class="sub">Pick your site type. We bring the stack.</p>
+  <div class="scn" id="allScn"></div>
+ </section>
+
+ <section data-sec>
+  <div class="note">[section: custom-liquid · delivery stepper]</div>
+  <div class="eyebrow">Delivery</div>
+  <h2>Five steps, start to run.</h2>
+  <div class="stepper">
+   <div class="step"><div><b>Discover</b><span>Goals &amp; site</span></div></div>
+   <div class="step"><div><b>Assess</b><span>Devices &amp; fit</span></div></div>
+   <div class="step"><div><b>Prove</b><span>Small pilot</span></div></div>
+   <div class="step"><div><b>Deliver</b><span>Install &amp; connect</span></div></div>
+   <div class="step"><div><b>Operate</b><span>Monitor &amp; support</span></div></div>
+  </div>
+  <p class="sub" style="margin:26px auto 0;text-align:center">Delivered with our implementation partner.</p>
+ </section>
+
+ <section data-sec>
+  <div class="note">[section: call-to-action-banner]</div>
+  <div class="cta">
+   <h2>Have a site in mind?</h2>
+   <button class="btn" data-go="inquire">Request a project consultation</button>
+  </div>
+ </section>
+</div>
+
+<!-- ============ DEVICES ============ -->
+<div class="panel" id="devices">
+ <section data-sec style="margin-top:40px">
+  <div class="note">[section: main-collection · light catalog grid]</div>
+  <div class="eyebrow">Devices</div>
+  <h2>A light, curated catalog.</h2>
+  <p class="sub">Project-ready hardware. Tap a tile for the short version.</p>
+  <div class="chips" id="filters"></div>
+  <div class="dev" id="devGrid"></div>
+  <div class="note-line"><b class="mono">FastCon</b><span>Fast, low-power protocol for supported lights.</span></div>
+ </section>
+
+ <section data-sec>
+  <div class="note">[section: 4 icon chips · trust]</div>
+  <div class="chips" style="margin-top:0">
+   <span class="chip">🚚 Local shipping</span>
+   <span class="chip">🛡️ Local warranty</span>
+   <span class="chip">🔧 Authorized service</span>
+   <span class="chip">💬 Regional support</span>
+  </div>
+ </section>
+</div>
+
+<!-- ============ INQUIRE ============ -->
+<div class="panel" id="inquire">
+ <section data-sec style="margin-top:40px">
+  <div class="note">[section: contact-form · image-with-form]</div>
+  <div class="inq">
+   <div class="side">
+    <img src="assets/business/facilities.jpg" alt="Managed commercial facility">
+    <div>
+     <h2>Let's scope your project.</h2>
+     <p>Short form. Quick reply.</p>
+    </div>
+   </div>
+   <form id="form" novalidate>
+    <div class="f2">
+     <label>Name<input type="text" name="name" required placeholder="Your name"></label>
+     <label>Company<input type="text" name="company" placeholder="Company"></label>
+    </div>
+    <label>Work email<input type="email" name="email" required placeholder="you@company.example"></label>
+    <div class="f2">
+     <label>Site type
+      <select name="site">
+       <option>Residential</option><option>Offices</option><option>Education</option>
+       <option>Hospitality</option><option>Car parks &amp; energy</option><option>Buildings &amp; facilities</option>
+      </select>
+     </label>
+     <label>Scale
+      <select name="scale"><option>Under 50 units</option><option>50–500 units</option><option>500+ units</option></select>
+     </label>
+    </div>
+    <label>Needs
+     <div class="chk">
+      <label><input type="checkbox" checked><span>Devices</span></label>
+      <label><input type="checkbox"><span>Software</span></label>
+      <label><input type="checkbox"><span>API / SDK</span></label>
+      <label><input type="checkbox"><span>Integration help</span></label>
+     </div>
+    </label>
+    <label>Note<textarea name="note" placeholder="One or two lines"></textarea></label>
+    <button class="btn" type="submit">Request a project consultation</button>
+   </form>
+  </div>
+ </section>
+</div>
+
+</main>
+
+<footer><div class="wrap"><span>© BroadLink · Preview</span><span>Local shipping · Local warranty · Authorized service · Regional support</span></div></footer>
+
+<div class="modal" id="modal" aria-modal="true" role="dialog">
+ <div class="mbox">
+  <button class="x" id="mx" aria-label="Close">×</button>
+  <div class="tile" id="mTile"></div>
+  <div class="tx">
+   <div class="eyebrow" id="mCat"></div>
+   <h3 id="mName"></h3>
+   <ul id="mList"></ul>
+   <button class="btn" id="mCta">Ask about this device</button>
+  </div>
+ </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+ const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+
+ /* ---------- data ---------- */
+ const SCN=[
+  {t:"Residential",img:"property.jpg",alt:"Modern residential building",line:"Move-in ready smart units, managed centrally.",tag:"Multi-unit",d:"Pilot: one floor, then roll out building-wide."},
+  {t:"Offices",img:"office.jpg",alt:"Open-plan office",line:"Lighting, presence and comfort in one view.",tag:"Workplace",d:"Pilot: one floor of meeting rooms."},
+  {t:"Education",img:"education.jpg",alt:"Campus classroom",line:"Classrooms that switch on schedule.",tag:"Campus",d:"Pilot: a single classroom block."},
+  {t:"Hospitality",img:"hospitality.jpg",alt:"Hotel guest room",line:"Guest-room scenes with staff-side control.",tag:"Hotels",d:"Pilot: ten rooms, one wing."},
+  {t:"Car parks & energy",img:"carpark.jpg",alt:"Parking structure with energy monitoring",line:"Smart lighting and load insight for car parks.",tag:"Energy",d:"Pilot: one level with occupancy lighting."},
+  {t:"Buildings & facilities",img:"facilities.jpg",alt:"Facility management room",line:"One console for every plant and zone.",tag:"Facilities",d:"Pilot: one plant room and one zone."}
+ ];
+ const PF={Matter:"matter_icon.png","Apple Home":"applehome_icon.png","Google Home":"googlehome_icon.png",Alexa:"alexa_icon.png",SmartThings:"smartthings_icon.png"};
+ const DEV=[
+  {n:"RM4 PRO",c:"Hubs",g:"remote",a:["#006FFF","#6FB0FF"],l:"IR + RF universal controller.",pf:["Matter","Alexa","Google Home"],b:["IR and RF control","Temp & humidity sensing","Scenes and schedules","API-ready","Wall-powered"]},
+  {n:"Smart Hub",c:"Hubs",g:"hub",a:["#0A0F14","#3A4B5F"],l:"Gateway for site-wide devices.",pf:["Matter","Apple Home"],b:["Matter controller","Local automation","Ethernet or Wi-Fi","Cloud API","Multi-room"]},
+  {n:"Smart Plug",c:"Plugs",g:"plug",a:["#0058CC","#4EA1FF"],l:"On/off with energy readout.",pf:["Matter","Google Home"],b:["Energy monitoring","Schedules","Overload protection","Compact fit","Matter-ready"]},
+  {n:"Wall Switch",c:"Plugs",g:"switch",a:["#4A5A6E","#A9B7C8"],l:"In-wall relay for fixed loads.",pf:["Matter","SmartThings"],b:["Fits standard boxes","Local fallback","Scene buttons","Low standby power"]},
+  {n:"Smart Bulb",c:"Lights",g:"bulb",a:["#FF9A3C","#FFD66B"],l:"Tunable white and color.",pf:["Matter","Alexa","Apple Home"],b:["Tunable white","Full color","Dimming","FastCon-ready","Group control"]},
+  {n:"LED Strip",c:"Lights",g:"strip",a:["#7B3FF2","#5AC8FA"],l:"Accent lighting for any zone.",pf:["Google Home","Alexa"],b:["Cuttable length","Color scenes","FastCon-ready","Easy mounting"]},
+  {n:"Motion Sensor",c:"Sensors",g:"motion",a:["#0F9D8A","#6EE0C8"],l:"Presence for lights and HVAC.",pf:["Matter","SmartThings"],b:["PIR detection","Battery powered","Adjustable timeout","Tamper alert","Light level"]},
+  {n:"Climate Sensor",c:"Sensors",g:"climate",a:["#0058CC","#9CC8FF"],l:"Temperature and humidity.",pf:["Matter","Apple Home"],b:["Temp & humidity","Compact display","Long battery life","Threshold alerts"]}
+ ];
+
+ /* ---------- device glyphs (SVG) ---------- */
+ const GL={
+  remote:'<rect x="56" y="62" width="88" height="76" rx="22" fill="#fff" opacity=".95"/><circle cx="100" cy="100" r="18" fill="none" stroke="currentColor" stroke-width="5"/><circle cx="100" cy="100" r="5" fill="currentColor"/><path d="M80 70q20-14 40 0" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round"/>',
+  hub:'<rect x="52" y="82" width="96" height="48" rx="24" fill="#fff" opacity=".95"/><circle cx="100" cy="106" r="8" fill="currentColor"/><path d="M78 70q22-22 44 0M66 58q34-34 68 0" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" opacity=".9"/>',
+  plug:'<rect x="62" y="56" width="76" height="88" rx="20" fill="#fff" opacity=".95"/><rect x="80" y="76" width="8" height="20" rx="3" fill="currentColor"/><rect x="112" y="76" width="8" height="20" rx="3" fill="currentColor"/><circle cx="100" cy="122" r="8" fill="none" stroke="currentColor" stroke-width="4"/>',
+  switch:'<rect x="66" y="50" width="68" height="100" rx="14" fill="#fff" opacity=".95"/><rect x="82" y="68" width="36" height="64" rx="10" fill="currentColor" opacity=".2"/><rect x="82" y="68" width="36" height="34" rx="10" fill="currentColor"/>',
+  bulb:'<path d="M100 48a38 38 0 0 0-22 69v9h44v-9a38 38 0 0 0-22-69z" fill="#fff" opacity=".95"/><rect x="82" y="130" width="36" height="8" rx="4" fill="#fff"/><rect x="88" y="142" width="24" height="8" rx="4" fill="#fff"/><path d="M90 108l10-16 10 16" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+  strip:'<path d="M38 128q30-60 62-24t62-40" stroke="#fff" stroke-width="16" fill="none" stroke-linecap="round" opacity=".95"/><g fill="currentColor"><circle cx="52" cy="110" r="4"/><circle cx="78" cy="102" r="4"/><circle cx="104" cy="104" r="4"/><circle cx="130" cy="88" r="4"/><circle cx="152" cy="70" r="4"/></g>',
+  motion:'<circle cx="100" cy="100" r="40" fill="#fff" opacity=".95"/><circle cx="100" cy="100" r="18" fill="currentColor"/><path d="M52 62q-14 38 0 76M148 62q14 38 0 76" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" opacity=".8"/>',
+  climate:'<rect x="58" y="58" width="84" height="84" rx="22" fill="#fff" opacity=".95"/><path d="M92 114V82a8 8 0 0 1 16 0v32a14 14 0 1 1-16 0z" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/><circle cx="100" cy="122" r="5" fill="currentColor"/>'
+ };
+ const art=(d,withPf,id)=>{
+  const gid="g"+d.n.replace(/\W/g,"");
+  const pf=withPf?`<span class="pf"><img src="assets/partners/${PF[d.pf[0]]}" alt="${d.pf[0]}"></span>`:"";
+  return `<div class="tile"${id?` id="${id}"`:""}><svg viewBox="0 0 200 200" style="color:${d.a[0]}" role="img" aria-label="${d.n} illustration"><defs><linearGradient id="${gid}${id||""}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${d.a[0]}"/><stop offset="1" stop-color="${d.a[1]}"/></linearGradient></defs><rect width="200" height="200" fill="url(#${gid}${id||""})"/><circle cx="170" cy="30" r="60" fill="#fff" opacity=".08"/><ellipse cx="100" cy="164" rx="46" ry="6" fill="#000" opacity=".18"/><g>${GL[d.g]}</g></svg>${pf}</div>`;
+ };
+
+ /* ---------- scenario cards ---------- */
+ const scCard=s=>`<article class="sc"><div class="ph"><img src="assets/business/${s.img}" alt="${s.alt}"><em>${s.tag}</em></div><div class="bd"><h3>${s.t}</h3><p>${s.line}</p><details><summary>Details</summary><span>${s.d}</span></details></div></article>`;
+ $("#teasers").innerHTML=[SCN[0],SCN[1],SCN[4]].map(scCard).join("");
+ $("#allScn").innerHTML=SCN.map(scCard).join("");
+
+ /* ---------- devices ---------- */
+ const cats=["All",...new Set(DEV.map(d=>d.c))];
+ let cur="All";
+ const flt=$("#filters");
+ function drawFilters(){flt.innerHTML=cats.map(c=>`<button class="chip${c===cur?" on":""}" data-c="${c}">${c}</button>`).join("")}
+ function drawDev(){
+  $("#devGrid").innerHTML=DEV.map((d,i)=>({d,i})).filter(x=>cur==="All"||x.d.c===cur)
+   .map(x=>`<button class="card" data-i="${x.i}">${art(x.d,true)}<h3>${x.d.n}</h3><p>${x.d.l}</p></button>`).join("");
+ }
+ flt.addEventListener("click",e=>{const b=e.target.closest("[data-c]");if(!b)return;cur=b.dataset.c;drawFilters();drawDev()});
+ drawFilters();drawDev();
+
+ const modal=$("#modal");
+ $("#devGrid").addEventListener("click",e=>{
+  const b=e.target.closest("[data-i]");if(!b)return;
+  const d=DEV[+b.dataset.i];
+  $("#mTile").outerHTML=art(d,false,"mTile");
+  $("#mCat").textContent=d.c;$("#mName").textContent=d.n;
+  $("#mList").innerHTML=d.b.slice(0,5).map(x=>`<li>${x}</li>`).join("");
+  modal.classList.add("on");
+ });
+ const closeM=()=>modal.classList.remove("on");
+ $("#mx").onclick=closeM;
+ modal.addEventListener("click",e=>{if(e.target===modal)closeM()});
+ document.addEventListener("keydown",e=>{if(e.key==="Escape")closeM()});
+ $("#mCta").onclick=()=>{closeM();show("inquire")};
+
+ /* ---------- tabs ---------- */
+ function show(id){
+  $$(".panel").forEach(p=>p.classList.toggle("on",p.id===id));
+  $$(".tab").forEach(t=>t.classList.toggle("on",t.dataset.tab===id));
+  window.scrollTo({top:0,behavior:"smooth"});
+ }
+ $("#tabs").addEventListener("click",e=>{const t=e.target.closest("[data-tab]");if(t)show(t.dataset.tab)});
+ document.addEventListener("click",e=>{const g=e.target.closest("[data-go]");if(g)show(g.dataset.go)});
+
+ /* ---------- annotations toggle ---------- */
+ const nt=$("#notes");
+ nt.addEventListener("change",()=>document.body.classList.toggle("show-notes",nt.checked));
+
+ /* ---------- form + toast ---------- */
+ const toast=$("#toast");
+ function say(m){toast.textContent=m;toast.classList.add("on");clearTimeout(say.t);say.t=setTimeout(()=>toast.classList.remove("on"),3200)}
+ $("#form").addEventListener("submit",e=>{
+  e.preventDefault();
+  const f=e.target;
+  if(!f.elements.name.value.trim()||!/^\S+@\S+\.\S+$/.test(f.elements.email.value)){say("Please add your name and a valid email.");return}
+  say("Thanks — we'll be in touch shortly.");
+  f.reset();
+ });
+})();
+</script>
+</body>
+</html>
